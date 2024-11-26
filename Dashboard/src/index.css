@@ -28,3 +28,7 @@ a{
   color: white;
   text-decoration: none;
 }
+.container{
+  display: flex;
+  flex-direction: row;
+}

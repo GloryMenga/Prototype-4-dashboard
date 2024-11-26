@@ -1,0 +1,97 @@
+/*SideNav*/
+nav{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 25%;
+  height: 100vh;
+  border-right: 1px solid #37393f;
+}
+nav ul{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 88%;
+}
+.nav-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+.logo{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  font-weight: 800;
+  font-size: 20px;
+}
+.logo img{
+  margin-right: 15px;
+  height: 60px;
+  width: 60px;
+}
+.account{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+}
+.account img{
+  height: 80px;
+  width: 80px;
+}
+.account a{
+  border: 1px solid #6a6531;
+  padding: 5px 10px;
+  font-size: 13px;
+  border-radius: 15px;
+  margin-top: 25px;
+  transition: 0.3s;
+}
+.account a:hover{
+  border: 1px solid #37393f;
+  font-weight: 600;
+  color: #37393f;
+  background-color: #fff27a;
+}
+.menu{
+  margin-top: 65px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 55%;
+}
+.menu-icon{
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 10px;
+  padding: 15px 40px;
+  transition: 0.3s;
+}
+.menu-icon.active {
+  background-color: #35363b; 
+}
+.menu-icon:hover{
+  background-color: #5e616b;
+}
+.menu-icon img{
+  height: 25px;
+  width: 25px;
+}
+.menu-icon p{
+  font-size: 15px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  margin-left: 30px;
+}

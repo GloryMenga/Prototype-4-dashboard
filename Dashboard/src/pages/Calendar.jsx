@@ -1,18 +1,18 @@
 import React from "react";
 import SideNav from "../components/SideNav.jsx";
 
-function Home(){
+function Calendar(){
 
     return(
         <>
             <div className="container">
                 <SideNav />
                 <div className="wrapper">
-                    home
+                    calendar
                 </div>
             </div>
         </>
     );
 }
 
-export default Home;
+export default Calendar;

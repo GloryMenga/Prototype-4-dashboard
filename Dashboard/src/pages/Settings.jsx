@@ -1,18 +1,18 @@
 import React from "react";
 import SideNav from "../components/SideNav.jsx";
 
-function Home(){
+function Settings(){
 
     return(
         <>
             <div className="container">
                 <SideNav />
                 <div className="wrapper">
-                    home
+                    settings
                 </div>
             </div>
         </>
     );
 }
 
-export default Home;
+export default Settings;
