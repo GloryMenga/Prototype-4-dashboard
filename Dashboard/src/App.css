@@ -78,6 +78,7 @@ nav ul{
   border-radius: 10px;
   padding: 15px 40px;
   transition: 0.3s;
+  width: 150px;
 }
 .menu-icon.active {
   background-color: #35363b; 
@@ -94,4 +95,102 @@ nav ul{
   font-weight: 300;
   letter-spacing: 1px;
   margin-left: 30px;
+}
+
+/*Login*/
+.register-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.login-form{
+  margin-top: 20px;
+  background-color: white;
+  border-radius: 15px;
+  width: 600px;
+}
+.login-form form{
+  padding: 30px;
+}
+#loginform button{
+  width: 100%;
+  height: 45px;
+  margin-top: 50px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-family: 'Noto Sans';
+  background-color: #70737e;
+  cursor: pointer;
+  font-weight: 800;
+  transition: 0.3s;
+}
+#loginform button:hover{
+  background-color: #414246;
+}
+.login-paragraphe{
+  margin-top: 25px;
+}
+.login-paragraphe a{
+  text-decoration: underline;
+}
+.login-paragraphe p{
+  font-weight: 200;
+}
+.inputs{
+  margin-top: 40px;
+}
+.input-group input{
+  width: 90%;
+}
+.input-group input::placeholder{
+  font-family: 'Noto Sans';
+  font-size: 15px;
+  font-weight: 300;
+  color: #858a94;
+}
+.login-form .input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.login-form .input-group input {
+  padding: 12px 16px 12px 40px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.login-form .input-group svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 16px;
+}
+.check-password{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 30px;
+}
+.check-password p{
+  font-family: 'Noto Sans';
+  margin-left: 10px;
+  color: black;
+}
+.title-form{
+  display: flex;
+  justify-content: center;
+}
+.title-form h2{
+  font-weight: bold;
+  color: rgb(120, 119, 119);
+}
+.check-password input{
+  height: 24px;
+  width: 24px;
 }

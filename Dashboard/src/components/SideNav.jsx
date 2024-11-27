@@ -24,7 +24,7 @@ function SideNav() {
                         </div>
                         <div className="account">
                             <img src={Default} alt="Default profile picture" />
-                            <Link to={"#"}>
+                            <Link to={"/login"}>
                                 Log in
                             </Link>
                         </div>
