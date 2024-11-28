@@ -28,11 +28,11 @@ function SignUp(){
                 <div className="inputs">
                     <div className="input-group">
                         <FontAwesomeIcon icon={faUser} />
-                        <input type="email" name="email" id="inputEmail" placeholder="enter your Name" required />
+                        <input type="name" name="name" id="inputname" placeholder="enter your Name" required />
                     </div>
                     <div className="input-group">
                         <FontAwesomeIcon icon={faEnvelope} />
-                        <input type="email" name="email" id="inputEmail" placeholder="enter your email" required />
+                        <input type="email" name="email" id="inputEmail22" placeholder="enter your email" required />
                     </div>
                     <div className="input-group">
                         <FontAwesomeIcon icon={faLock} />
