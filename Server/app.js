@@ -20,12 +20,12 @@ app.use(express.json());
 // Register a new user
 app.post("/register", async (req, res) => {
     console.log("Request received:", req.body);
-    const { username, email, password } = req.body;
+    const { username, email, password, gender } = req.body;
 
-    if (!username || !email || !password) {
+    if (!username || !email || !password || !gender) {
         return res.status(400).send({
             status: "Bad Request",
-            message: "All fields (username, email, password) are required.",
+            message: "All fields (username, email, password, gender) are required.",
         });
     }
 
@@ -50,7 +50,8 @@ app.post("/register", async (req, res) => {
             username, 
             email, 
             password: hashedPassword, 
-            status: "Student" // Default status
+            status: "Student", // Default status
+            gender, // Include gender
         };
         await usersCollection.insertOne(newUser);
 
@@ -62,6 +63,7 @@ app.post("/register", async (req, res) => {
                 username: newUser.username, 
                 email: newUser.email,
                 status: newUser.status,
+                gender: newUser.gender, // Include gender in the response
             },
         });
     } catch (error) {
@@ -114,9 +116,10 @@ app.post("/login", async (req, res) => {
                 uuid: user.uuid,
                 username: user.username,
                 email: user.email,
-                status: user.status, 
+                status: user.status,
+                gender: user.gender, 
             },
-        });
+        });        
     } catch (error) {
         console.error(error);
         res.status(500).send({

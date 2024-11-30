@@ -2,6 +2,8 @@ import React, { useContext } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
 import { Link, useLocation } from "react-router-dom";
 import Hat from "../assets/hat.svg";
+import Man from "../assets/man.svg";
+import Woman from "../assets/woman.svg";
 import Default from "../assets/default.svg";
 import Dashboard from "../assets/dashboard.svg";
 import Calendar from "../assets/calendar.svg";
@@ -26,7 +28,10 @@ function SideNav() {
                             </Link>
                         </div>
                         <div className="account">
-                            <img src={Default} alt="Profile" />
+                            <img 
+                                src={user ? (user.gender === "male" ? Man : Woman) : Default} 
+                                alt="Profile" 
+                            />
                             {user ? (
                                 <>
                                     <h2>{user.username}</h2>

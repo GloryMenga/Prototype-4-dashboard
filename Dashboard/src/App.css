@@ -44,6 +44,14 @@ nav ul{
   justify-content: center;
   margin-top: 50px;
 }
+.account h2{
+  margin-top: 20px;
+}
+.account p{
+  margin-top: 5px;
+  font-weight: 300;
+  color: #b9b9b9;
+}
 .account img{
   height: 80px;
   width: 80px;
@@ -55,6 +63,9 @@ nav ul{
   border-radius: 15px;
   margin-top: 25px;
   transition: 0.3s;
+}
+.account button{
+  margin-top: 40px;
 }
 .account a:hover{
   border: 1px solid #37393f;
@@ -209,3 +220,118 @@ nav ul{
   height: 24px;
   width: 24px;
 }
+
+/*Gender style*/
+.gender {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.gender-select {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  appearance: none;
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='none' stroke='%23666' stroke-width='2' d='M7 7l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  cursor: pointer;
+}
+
+.gender-select:focus {
+  outline: none;
+  border-color: #70737e;
+  box-shadow: 0 0 5px rgba(112, 115, 126, 0.5);
+}
+
+.gender-select option {
+  font-size: 16px;
+  color: #333;
+}
+/*Calendar*/
+.calendar-container {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  margin: 20px;
+  font-family: "Noto Sans", sans-serif;
+}
+
+/* FullCalendar Header Toolbar */
+.fc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  color: #333;
+}
+
+.fc-toolbar-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.fc-button {
+  border: none;
+  background-color: #007bff;
+  color: #ffffff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.fc-button:hover {
+  background-color: #0056b3;
+}
+
+.fc-button-primary.fc-button-active {
+  background-color: #0056b3;
+}
+
+/* Calendar Grid */
+.fc-daygrid-day {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #333;
+  border: 1px solid #e0e0e0;
+  background-color: #ffffff;
+}
+
+.fc-day-today {
+  background-color: #ffdd57 !important; /* Highlight today's date */
+  color: #333;
+}
+
+.fc-scrollgrid {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.fc-col-header-cell {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  font-size: 0.9rem;
+  padding: 10px;
+  color: #333;
+}
+
+/* Hover effect for days */
+.fc-daygrid-day:hover {
+  background-color: #f1f1f1;
+  cursor: pointer;
+}
+
