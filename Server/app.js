@@ -45,13 +45,24 @@ app.post("/register", async (req, res) => {
 
         // Hash password and store user
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = { uuid: uuidv4(), username, email, password: hashedPassword };
+        const newUser = { 
+            uuid: uuidv4(), 
+            username, 
+            email, 
+            password: hashedPassword, 
+            status: "Student" // Default status
+        };
         await usersCollection.insertOne(newUser);
 
         res.status(201).send({
             status: "Success",
             message: "User registered successfully.",
-            data: { uuid: newUser.uuid, username: newUser.username, email: newUser.email },
+            data: { 
+                uuid: newUser.uuid, 
+                username: newUser.username, 
+                email: newUser.email,
+                status: newUser.status,
+            },
         });
     } catch (error) {
         console.error(error);
@@ -103,6 +114,7 @@ app.post("/login", async (req, res) => {
                 uuid: user.uuid,
                 username: user.username,
                 email: user.email,
+                status: user.status, 
             },
         });
     } catch (error) {

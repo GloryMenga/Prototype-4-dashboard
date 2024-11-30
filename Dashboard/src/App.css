@@ -62,6 +62,21 @@ nav ul{
   color: #37393f;
   background-color: #fff27a;
 }
+.disconnect-button {
+  border: 1px solid #68201d;
+  color: #ffffff;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-weight: 600;
+  margin-top: 25px;
+  transition: 0.3s;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.disconnect-button:hover {
+  background-color: #681111;
+}
 .menu{
   margin-top: 65px;
   display: flex;
