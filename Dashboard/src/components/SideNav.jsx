@@ -72,10 +72,7 @@ function SideNav() {
                                 </div>
                             </Link>
                         </div>
-                    </div>
-                    <div className="settings">
-                        <p>Light / Dark</p>
-                    </div>  
+                    </div> 
                 </ul>
             </nav>
         </>
