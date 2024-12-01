@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { MongoClient } = require("mongodb");
+const { ObjectId } = require("mongodb");
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
 
@@ -63,7 +64,7 @@ app.post("/register", async (req, res) => {
                 username: newUser.username, 
                 email: newUser.email,
                 status: newUser.status,
-                gender: newUser.gender, // Include gender in the response
+                gender: newUser.gender, 
             },
         });
     } catch (error) {
@@ -126,6 +127,109 @@ app.post("/login", async (req, res) => {
             status: "Error",
             message: "An error occurred while logging in.",
         });
+    } finally {
+        await client.close();
+    }
+});
+
+// Add Assignment
+app.post("/assignments", async (req, res) => {
+    const { name, description, deadline } = req.body;
+
+    if (!name || !description || !deadline) {
+        console.error("Missing required fields:", req.body);
+        return res.status(400).send({ message: "All fields are required." });
+    }
+
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const assignmentsCollection = db.collection("Assignments");
+
+        const newAssignment = { name, description, deadline, createdAt: new Date() };
+        const result = await assignmentsCollection.insertOne(newAssignment);
+
+        if (!result.insertedId) {
+            console.error("Insert failed:", result);
+            return res.status(500).send({ message: "Failed to add assignment." });
+        }
+
+        const insertedAssignment = await assignmentsCollection.findOne({ _id: result.insertedId });
+        res.status(201).send({ message: "Assignment added successfully", assignment: insertedAssignment });
+    } catch (error) {
+        console.error("Error while adding assignment:", error);
+        res.status(500).send({ message: "Failed to add assignment.", error });
+    } finally {
+        await client.close();
+    }
+});
+
+// Get All Assignments
+app.get("/assignments", async (req, res) => {
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const assignmentsCollection = db.collection("Assignments");
+
+        const assignments = await assignmentsCollection.find().sort({ createdAt: -1 }).toArray();
+        res.status(200).send(assignments);
+    } catch (error) {
+        res.status(500).send({ message: "Failed to retrieve assignments", error });
+    } finally {
+        await client.close();
+    }
+});
+
+// Update Assignment
+app.put("/assignments/:id", async (req, res) => {
+    const { id } = req.params;
+    const { name, description, deadline } = req.body;
+
+    if (!name || !description || !deadline) {
+        return res.status(400).send({ message: "All fields are required." });
+    }
+
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const assignmentsCollection = db.collection("Assignments");
+
+        const updatedAssignment = { name, description, deadline };
+        const result = await assignmentsCollection.updateOne(
+            { _id: new ObjectId(id) }, // Convert id to ObjectId
+            { $set: updatedAssignment }
+        );
+
+        if (result.matchedCount === 0) {
+            return res.status(404).send({ message: "Assignment not found" });
+        }
+
+        res.status(200).send({ message: "Assignment updated successfully" });
+    } catch (error) {
+        res.status(500).send({ message: "Failed to update assignment", error });
+    } finally {
+        await client.close();
+    }
+});
+
+// Delete Assignment
+app.delete("/assignments/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const assignmentsCollection = db.collection("Assignments");
+
+        const result = await assignmentsCollection.deleteOne({ _id: new ObjectId(id) });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).send({ message: "Assignment not found" });
+        }
+
+        res.status(200).send({ message: "Assignment deleted successfully" });
+    } catch (error) {
+        res.status(500).send({ message: "Failed to delete assignment", error });
     } finally {
         await client.close();
     }
