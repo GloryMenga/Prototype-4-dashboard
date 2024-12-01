@@ -258,12 +258,11 @@ nav ul{
 }
 /*Calendar*/
 .calendar-container {
+  width: 75%;
   flex-grow: 1;
   padding: 20px;
   background-color: #ffffff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  margin: 20px;
   font-family: "Noto Sans", sans-serif;
 }
 
@@ -272,24 +271,27 @@ nav ul{
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  background-color: #f8f9fa;
-  border-radius: 10px;
+  padding: 10px 0px;
   color: #333;
+  width: 100%;
 }
 
+.fc .fc-col-header-cell-cushion{
+  color: #333;
+  padding: 8px 4px;
+}
 .fc-toolbar-title {
   font-size: 1.5rem;
   font-weight: bold;
+  color: #333;
 }
 
 .fc-button {
+  padding: 5px 10px;
   border: none;
   background-color: #007bff;
-  color: #ffffff;
-  padding: 5px 10px;
+  color: #fff;
   border-radius: 5px;
-  font-size: 0.9rem;
   cursor: pointer;
   transition: background-color 0.3s;
 }
@@ -311,8 +313,11 @@ nav ul{
   background-color: #ffffff;
 }
 
+.fc .fc-daygrid-day-number{
+  color: #000;
+}
 .fc-day-today {
-  background-color: #ffdd57 !important; /* Highlight today's date */
+  background-color: #c2c2c2 !important; 
   color: #333;
 }
 
