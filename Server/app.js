@@ -198,16 +198,22 @@ app.post("/assignments", async (req, res) => {
 // Get All Assignments
 app.get("/assignments", async (req, res) => {
     try {
-        await client.connect();
-        const db = client.db(dbName);
+        const db = await connectToDatabase();
         const assignmentsCollection = db.collection("Assignments");
 
-        const assignments = await assignmentsCollection.find().sort({ createdAt: -1 }).toArray();
-        res.status(200).send(assignments);
+        const assignments = await assignmentsCollection.find().toArray();
+
+        // Ensure all assignments have a valid deadline field
+        const filteredAssignments = assignments.filter((assignment) => assignment.deadline && !isNaN(new Date(assignment.deadline).getTime()));
+
+        res.status(200).send(filteredAssignments);
     } catch (error) {
-        res.status(500).send({ message: "Failed to retrieve assignments", error });
-    } finally {
-        await client.close();
+        console.error("Error fetching assignments:", error.message);
+        res.status(500).send({
+            status: "Error",
+            message: "Failed to retrieve assignments",
+            error: error.message,
+        });
     }
 });
 
@@ -385,7 +391,7 @@ app.get("/subjects", async (req, res) => {
             error: error.message 
         });
     } finally {
-        await client.close(); // Ensure connection is closed
+        await client.close(); 
     }
 });
 
@@ -505,7 +511,7 @@ app.delete("/grades/:id", async (req, res) => {
 // Start the server
 app.listen(port, async () => {
     try {
-        await connectToDatabase(); // Ensure this references the correct function
+        await connectToDatabase(); 
         console.log(`Server is running on http://localhost:${port}`);
     } catch (error) {
         console.error("Failed to start server", error);

@@ -503,8 +503,167 @@ nav ul{
 
 /*dashboard*/
 .dashboard{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   height: 100vh;
 }
+
+.dashboard-wrapper{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 95%;
+  height: 85%;
+}
+.row1{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 48%;
+}
+
+/*Info/charts*/
+.number-subjects{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #fff27a;
+  border-radius: 15px;
+  width: 32%;
+}
+.number-subjects p{
+  font-weight: 300;
+  font-size: 40px;
+  color: #242529;
+}
+.number-subjects h2{
+  font-size: 80px;
+  color: #242529;
+}
+.title-number-subjects{
+  margin-top: 20px;
+  margin-left: 30px;
+}
+.amount-number-subjects{
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+  margin-right: 30px;
+}
+
+
+.totale-students{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #37383f;
+  border-radius: 15px;
+  width: 32%;
+}
+.totale-students p{
+  font-weight: 300;
+  font-size: 40px;
+}
+.totale-students h2{
+  font-size: 80px;
+}
+.title-totale-students{
+  margin-top: 20px;
+  margin-left: 30px;
+}
+.amount-totale-students{
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+  margin-right: 30px;
+}
+
+
+.performance-trend{
+  background-color: #dcdcdd;
+  border-radius: 15px;
+  width: 32%;
+}
+.percentage-subject{
+  background-color: #dcdcdd;
+  border-radius: 15px;
+  width: 66%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0px;
+}
+.percentage-subject canvas {
+  background: transparent;
+}
+.assignments-week{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #37383f;
+  border-radius: 15px;
+  width: 32%;
+}
+.assignments-week p{
+  font-weight: 300;
+  font-size: 40px;
+}
+.assignments-week h2{
+  font-size: 80px;
+}
+.title-assignments-week{
+  margin-top: 20px;
+  margin-left: 30px;
+}
+.amount-assignments-week{
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+  margin-right: 30px;
+}
+/*Info/charts*/
+
+/* Dashboard.css */
+.dropdown-container {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.modern-dropdown {
+  width: 15%; 
+  margin-left: 40px;
+  margin-bottom: 30px;
+  padding: 10px 35px 10px 15px;
+  font-size: 16px;
+  font-family: "Arial", sans-serif;
+  color: #333;
+  background: #f9f9f9 url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') no-repeat;
+  background-position: right 10px top 50%;
+  background-size: 24px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.modern-dropdown:hover {
+  background-color: #fff;
+  border-color: #bbb;
+}
+
+.modern-dropdown:focus {
+  border-color: #007bff;
+  box-shadow: 0px 0px 8px rgba(0, 123, 255, 0.5);
+}
+
 .grading{
   display: flex;
   flex-direction: row;
@@ -651,3 +810,4 @@ nav ul{
 .grade-actions button:hover{
   background-color: #414246;
 }
+/*Dashboard*/
