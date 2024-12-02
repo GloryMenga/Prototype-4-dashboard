@@ -15,26 +15,26 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-let isConnected = false;
+let db = null;
 
-async function connectToMongoDB() {
-    if (!isConnected) {
-        try {
-            await client.connect();
-            console.log("Connected to MongoDB");
-            isConnected = true;
-        } catch (error) {
-            console.error("Failed to connect to MongoDB", error);
-            throw error;
-        }
+async function connectToDatabase() {
+    if (db) return db;
+    try {
+        const client = new MongoClient(process.env.MONGODB_URL);
+        await client.connect();
+        console.log("Connected to MongoDB");
+        db = client.db(dbName);
+        return db;
+    } catch (error) {
+        console.error("Failed to connect to MongoDB", error);
+        throw error;
     }
-    return client.db(dbName);
 }
 
 // Middleware to ensure database connection
 const ensureDbConnection = async (req, res, next) => {
     try {
-        await connectToMongoDB();
+        await connectToDatabase();
         next();
     } catch (error) {
         res.status(500).send({ 
@@ -269,20 +269,23 @@ app.delete("/assignments/:id", async (req, res) => {
 // Fetch Grades
 app.get("/grades", async (req, res) => {
     try {
-        await client.connect();
-        const db = client.db(dbName);
+        const db = await connectToDatabase();
         const gradesCollection = db.collection("Grades");
 
         const grades = await gradesCollection.find().sort({ createdAt: -1 }).toArray();
+
+        if (!grades || grades.length === 0) {
+            return res.status(200).send([]);
+        }
+
         res.status(200).send(grades);
     } catch (error) {
+        console.error("Error fetching grades:", error.message);
         res.status(500).send({ 
             status: "Error", 
             message: "Failed to retrieve grades", 
-            error 
+            error: error.message 
         });
-    } finally {
-        await client.close();
     }
 });
 
@@ -360,39 +363,46 @@ app.post("/grades", async (req, res) => {
 });
 
 // Fetch Subjects for dropdown
-app.get("/subjects", ensureDbConnection, async (req, res) => {
+app.get("/subjects", async (req, res) => {
     try {
+        await client.connect();
         const db = client.db(dbName);
         const subjectsCollection = db.collection("Subjects");
 
         const subjects = await subjectsCollection.find().toArray();
+        
+        // If no subjects exist, return an empty array instead of throwing an error
+        if (subjects.length === 0) {
+            return res.status(200).send([]);
+        }
+
         res.status(200).send(subjects);
     } catch (error) {
+        console.error("Error fetching subjects:", error);
         res.status(500).send({ 
             status: "Error", 
             message: "Failed to retrieve subjects", 
-            error 
+            error: error.message 
         });
+    } finally {
+        await client.close(); // Ensure connection is closed
     }
 });
 
 // Fetch Students for dropdown
-app.get("/students", ensureDbConnection, async (req, res) => {
+app.get("/students", async (req, res) => {
     try {
-        const db = client.db(dbName);
-        const studentsCollection = db.collection("Students");
+        const database = await connectToDatabase();
+        const studentsCollection = database.collection("Students");
 
-        // Log the count of students before fetching
-        const studentCount = await studentsCollection.countDocuments();
         const students = await studentsCollection.find().toArray();
-
         res.status(200).send(students);
     } catch (error) {
-        console.error("Error fetching students:", error);
-        res.status(500).send({ 
-            status: "Error", 
-            message: "Failed to retrieve students.", 
-            error: error.message 
+        console.error("Error fetching students:", error.message);
+        res.status(500).send({
+            status: "Error",
+            message: "Failed to retrieve students",
+            error: error.message,
         });
     }
 });
@@ -495,7 +505,7 @@ app.delete("/grades/:id", async (req, res) => {
 // Start the server
 app.listen(port, async () => {
     try {
-        await connectToMongoDB();
+        await connectToDatabase(); // Ensure this references the correct function
         console.log(`Server is running on http://localhost:${port}`);
     } catch (error) {
         console.error("Failed to start server", error);

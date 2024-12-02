@@ -1,20 +1,20 @@
-import React from "react";
+import React, { useContext } from "react";
 import SideNav from "../components/SideNav.jsx";
 import Dashboard from "../components/Dashboard.jsx";
 import Grading from "../components/Grading.jsx";
+import { AuthContext } from "../context/AuthContext";
 
-function Home(){
+function Home() {
+    const { user } = useContext(AuthContext);
 
-    return(
-        <>
-            <div className="container">
-                <SideNav />
-                <div className="wrapper">
-                    <Dashboard />
-                    <Grading />
-                </div>
+    return (
+        <div className="container">
+            <SideNav />
+            <div className="wrapper">
+                <Dashboard />
+                {user && user.status === "Teacher" && <Grading />}
             </div>
-        </>
+        </div>
     );
 }
 

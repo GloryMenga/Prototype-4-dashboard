@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react"; // Added useContext
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBook, faUser, faClock, faStar } from "@fortawesome/free-solid-svg-icons";
+import { AuthContext } from "../context/AuthContext";
 
 function Grading() {
     const [subjects, setSubjects] = useState([]);
@@ -12,26 +13,33 @@ function Grading() {
     const [selectedStudent, setSelectedStudent] = useState("");
     const [deadline, setDeadline] = useState("");
     const [grade, setGrade] = useState("");
-
     const [currentGrade, setCurrentGrade] = useState(null);
 
-    // Fetch data and grades on component mount
+    const { user } = useContext(AuthContext); // Added useContext here
+
+    // Prevent access if not a teacher
+    if (!user || user.status !== "Teacher") {
+        return null; // Don't render anything for non-teachers
+    }
+
+    // Fetch data on component mount
     useEffect(() => {
         const fetchData = async () => {
             try {
+                // Fetch Subjects
                 const subjectsResponse = await fetch("http://localhost:5000/subjects");
                 if (!subjectsResponse.ok) throw new Error("Failed to fetch subjects");
-                const subjectsData = await subjectsResponse.json();
-                setSubjects(subjectsData.map((subject) => subject.name));
-
                 const studentsResponse = await fetch("http://localhost:5000/students");
                 if (!studentsResponse.ok) throw new Error("Failed to fetch students");
-                const studentsData = await studentsResponse.json();
-                setStudents(studentsData.map((student) => student.name));
-
                 const gradesResponse = await fetch("http://localhost:5000/grades");
                 if (!gradesResponse.ok) throw new Error("Failed to fetch grades");
+
+                const subjectsData = await subjectsResponse.json();
+                const studentsData = await studentsResponse.json();
                 const gradesData = await gradesResponse.json();
+
+                setSubjects(subjectsData.map((subject) => subject.name));
+                setStudents(studentsData.map((student) => student.name));
                 setGrades(gradesData);
             } catch (error) {
                 console.error("Error fetching data:", error.message);
@@ -42,9 +50,9 @@ function Grading() {
         fetchData();
     }, []);
 
+    // Add a new grade
     const handleSubmitGrade = async (e) => {
         e.preventDefault();
-
         try {
             const response = await fetch("http://localhost:5000/grades", {
                 method: "POST",
@@ -54,7 +62,7 @@ function Grading() {
                     studentName: selectedStudent,
                     subjectName: selectedSubject,
                     date: deadline,
-                    grade: grade,
+                    grade: parseFloat(grade),
                 }),
             });
 
@@ -64,13 +72,9 @@ function Grading() {
             setGrades((prevGrades) => [responseData.data, ...prevGrades]);
 
             alert("Grade submitted successfully!");
-            setCustomAssignmentName("");
-            setSelectedSubject("");
-            setSelectedStudent("");
-            setDeadline("");
-            setGrade("");
+            resetForm();
         } catch (error) {
-            console.error("Error submitting grade:", error);
+            console.error("Error submitting grade:", error.message);
             alert(`Failed to submit grade: ${error.message}`);
         }
     };
@@ -80,7 +84,7 @@ function Grading() {
         setCustomAssignmentName(grade.assignmentName);
         setSelectedSubject(grade.subjectName);
         setSelectedStudent(grade.studentName);
-        setDeadline(new Date(grade.date).toISOString().slice(0, 16)); // Format for datetime-local
+        setDeadline(new Date(grade.date).toISOString().slice(0, 16));
         setGrade(grade.grade);
     };
 
@@ -96,7 +100,7 @@ function Grading() {
                     studentName: selectedStudent,
                     subjectName: selectedSubject,
                     date: deadline,
-                    grade: grade,
+                    grade: parseFloat(grade),
                 }),
             });
 
@@ -111,14 +115,9 @@ function Grading() {
             );
 
             alert("Grade updated successfully!");
-            setCurrentGrade(null);
-            setCustomAssignmentName("");
-            setSelectedSubject("");
-            setSelectedStudent("");
-            setDeadline("");
-            setGrade("");
+            resetForm();
         } catch (error) {
-            console.error("Error updating grade:", error);
+            console.error("Error updating grade:", error.message);
             alert(`Failed to update grade: ${error.message}`);
         }
     };
@@ -136,16 +135,20 @@ function Grading() {
             setGrades((prevGrades) => prevGrades.filter((g) => g._id !== currentGrade._id));
 
             alert("Grade deleted successfully!");
-            setCurrentGrade(null);
-            setCustomAssignmentName("");
-            setSelectedSubject("");
-            setSelectedStudent("");
-            setDeadline("");
-            setGrade("");
+            resetForm();
         } catch (error) {
-            console.error("Error deleting grade:", error);
+            console.error("Error deleting grade:", error.message);
             alert(`Failed to delete grade: ${error.message}`);
         }
+    };
+
+    const resetForm = () => {
+        setCurrentGrade(null);
+        setCustomAssignmentName("");
+        setSelectedSubject("");
+        setSelectedStudent("");
+        setDeadline("");
+        setGrade("");
     };
 
     return (
@@ -259,17 +262,7 @@ function Grading() {
                         <button type="button" onClick={handleDeleteGrade}>
                             Delete Grade
                         </button>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setCurrentGrade(null);
-                                setCustomAssignmentName("");
-                                setSelectedSubject("");
-                                setSelectedStudent("");
-                                setDeadline("");
-                                setGrade("");
-                            }}
-                        >
+                        <button type="button" onClick={resetForm}>
                             Cancel
                         </button>
                     </div>
