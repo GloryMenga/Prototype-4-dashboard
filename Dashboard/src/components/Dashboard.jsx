@@ -1,18 +1,45 @@
-import React, { useState, useEffect } from "react";
-import { Bar } from "react-chartjs-2";
-import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from "chart.js";
+import React, { useState, useEffect, useContext } from "react";
+import { Bar, Line } from "react-chartjs-2";
+import {
+    Chart as ChartJS,
+    BarElement,
+    CategoryScale,
+    LinearScale,
+    Tooltip,
+    Legend,
+    PointElement,
+    LineElement,
+    TimeScale,
+} from "chart.js";
+import "chartjs-adapter-date-fns";
+import { AuthContext } from "../context/AuthContext.jsx";
 
-ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+ChartJS.register(
+    BarElement,
+    CategoryScale,
+    LinearScale,
+    Tooltip,
+    Legend,
+    PointElement,
+    LineElement,
+    TimeScale
+);
 
 function Dashboard() {
+    const { user } = useContext(AuthContext); 
     const [students, setStudents] = useState([]);
-    const [selectedStudent, setSelectedStudent] = useState(""); // Default to an empty string
+    const [selectedStudent, setSelectedStudent] = useState("");
     const [subjectCount, setSubjectCount] = useState(0);
     const [studentCount, setStudentCount] = useState(0);
     const [assignmentCount, setAssignmentCount] = useState(0);
     const [chartData, setChartData] = useState({ labels: [], datasets: [] });
+    const [trendData, setTrendData] = useState({ labels: [], datasets: [] });
+    const [subjects, setSubjects] = useState([]);
+    const [selectedSubject, setSelectedSubject] = useState("All Subjects");
 
     useEffect(() => {
+        if (!user) return; // Fetch only if user is logged in
+
         const fetchData = async () => {
             try {
                 // Fetch Students
@@ -20,13 +47,14 @@ function Dashboard() {
                 if (!studentsResponse.ok) throw new Error("Failed to fetch students");
                 const studentsData = await studentsResponse.json();
                 setStudents(studentsData);
-                if (studentsData.length > 0) setSelectedStudent(studentsData[0].name); // Set the first student as default
+                if (studentsData.length > 0) setSelectedStudent(studentsData[0].name);
 
-                // Fetch Subjects Count
+                // Fetch Subjects Count and List
                 const subjectsResponse = await fetch("http://localhost:5000/subjects");
                 if (!subjectsResponse.ok) throw new Error("Failed to fetch subjects");
                 const subjectsData = await subjectsResponse.json();
                 setSubjectCount(subjectsData.length);
+                setSubjects(["All Subjects", ...subjectsData.map((subject) => subject.name)]);
 
                 // Fetch Student Count
                 const studentCountResponse = await fetch("http://localhost:5000/students");
@@ -53,7 +81,7 @@ function Dashboard() {
         };
 
         fetchData();
-    }, []);
+    }, [user]);
 
     useEffect(() => {
         const fetchChartData = async () => {
@@ -64,10 +92,8 @@ function Dashboard() {
                 if (!gradesResponse.ok) throw new Error("Failed to fetch grades");
                 const gradesData = await gradesResponse.json();
 
-                // Filter grades for the selected student
                 const studentGrades = gradesData.filter((grade) => grade.studentName === selectedStudent);
 
-                // Calculate the average grade for each subject
                 const subjectGrades = {};
                 studentGrades.forEach((grade) => {
                     if (!subjectGrades[grade.subjectName]) {
@@ -79,7 +105,7 @@ function Dashboard() {
                 const labels = Object.keys(subjectGrades);
                 const averages = labels.map((subject) => {
                     const total = subjectGrades[subject].reduce((sum, grade) => sum + grade, 0);
-                    return (total / subjectGrades[subject].length).toFixed(2); // Average
+                    return (total / subjectGrades[subject].length).toFixed(2);
                 });
 
                 setChartData({
@@ -91,9 +117,6 @@ function Dashboard() {
                             backgroundColor: labels.map(() => "rgb(255,242,122)"),
                             borderColor: labels.map(() => "rgba(255, 206, 86, 1)"),
                             borderWidth: 1,
-                            hoverBackgroundColor: labels.map(() => "rgb(215, 204,105)"),
-                            hoverBorderColor: labels.map(() => "rgb(197,187,97)"),
-                            barPercentage: 0.5,
                         },
                     ],
                 });
@@ -106,30 +129,87 @@ function Dashboard() {
         fetchChartData();
     }, [selectedStudent]);
 
+    useEffect(() => {
+        const fetchTrendData = async () => {
+            if (!selectedStudent) return;
+
+            try {
+                const gradesResponse = await fetch("http://localhost:5000/grades");
+                if (!gradesResponse.ok) throw new Error("Failed to fetch grades");
+                const gradesData = await gradesResponse.json();
+
+                let studentGrades = gradesData.filter((grade) => grade.studentName === selectedStudent);
+                if (selectedSubject !== "All Subjects") {
+                    studentGrades = studentGrades.filter((grade) => grade.subjectName === selectedSubject);
+                }
+
+                const trendDataMap = {};
+                studentGrades.forEach((grade) => {
+                    const dateKey = new Date(grade.date).toISOString().split("T")[0];
+                    if (!trendDataMap[dateKey]) {
+                        trendDataMap[dateKey] = [];
+                    }
+                    trendDataMap[dateKey].push(grade.grade);
+                });
+
+                const trendLabels = Object.keys(trendDataMap).sort();
+                const trendValues = trendLabels.map((date) => {
+                    const grades = trendDataMap[date];
+                    return grades.reduce((sum, grade) => sum + grade, 0) / grades.length;
+                });
+
+                setTrendData({
+                    labels: trendLabels,
+                    datasets: [
+                        {
+                            label: selectedSubject,
+                            data: trendValues,
+                            fill: false,
+                            borderColor: "rgb(75, 192, 192)",
+                            tension: 0.4,
+                        },
+                    ],
+                });
+            } catch (error) {
+                console.error("Error fetching trend data:", error.message);
+                alert(`Error: ${error.message}`);
+            }
+        };
+
+        fetchTrendData();
+    }, [selectedStudent, selectedSubject]);
+
     const handleStudentChange = (e) => {
         setSelectedStudent(e.target.value);
     };
 
+    const handleSubjectChange = (e) => {
+        setSelectedSubject(e.target.value);
+    };
+
+    if (!user) {
+        return <h2 style={{ textAlign: "center", height: "100%", display: "flex", alignItems: "center",justifyContent: "center" }}>You should be logged in to see the dashboard</h2>;
+    }
+
     return (
         <div className="dashboard">
             <div className="dropdown-container">
-                <select
-                    className="modern-dropdown"
-                    value={selectedStudent || ""}
-                    onChange={handleStudentChange}
-                >
-                    <option value="" disabled>
-                        Select a Student
-                    </option>
-                    {students.map((student) => (
-                        <option key={student._id} value={student.name}>
-                            {student.name}
+                {user.status === "Student" ? (
+                    <h2>{user.username}</h2>
+                ) : (
+                    <select className="modern-dropdown" value={selectedStudent || ""} onChange={handleStudentChange}>
+                        <option value="" disabled>
+                            Select a Student
                         </option>
-                    ))}
-                </select>
+                        {students.map((student) => (
+                            <option key={student._id} value={student.name}>
+                                {student.name}
+                            </option>
+                        ))}
+                    </select>
+                )}
             </div>
 
-            {/* Dashboard Wrapper */}
             <div className="dashboard-wrapper">
                 <div className="row1">
                     <div className="number-subjects">
@@ -149,54 +229,89 @@ function Dashboard() {
                         </div>
                     </div>
                     <div className="performance-trend">
-                        {/* Leave Empty */}
+                        <div className="title-performance-trend">
+                            <h2>Performance Trend Over Time</h2>
+                            <div className="subject-dropdown">
+                                <select
+                                    className="modern-chart-dropdown"
+                                    value={selectedSubject}
+                                    onChange={handleSubjectChange}
+                                >
+                                    {subjects.map((subject, index) => (
+                                        <option key={index} value={subject}>
+                                            {subject}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                        <Line
+                            data={trendData}
+                            options={{
+                                responsive: true,
+                                plugins: {
+                                    legend: { display: true, position: "top" },
+                                },
+                                scales: {
+                                    x: {
+                                        type: "time",
+                                        time: {
+                                            unit: "month",
+                                            displayFormats: {
+                                                month: "MMMM",
+                                            },
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: "Time (Months)",
+                                        },
+                                        ticks: {
+                                            autoSkip: true,
+                                            maxTicksLimit: 12,
+                                        },
+                                    },
+                                    y: {
+                                        title: {
+                                            display: true,
+                                            text: "Grade",
+                                        },
+                                        min: 0,
+                                        max: 100,
+                                    },
+                                },
+                            }}
+                        />
                     </div>
                 </div>
                 <div className="row1">
                     <div className="percentage-subject">
+                        <h2>Percentage of each subject</h2>
                         <Bar
                             data={chartData}
                             options={{
                                 responsive: true,
+                                maintainAspectRatio: false,
                                 plugins: {
-                                    legend: {
-                                        display: true,
-                                        labels: { color: "#333", font: { size: 14 } },
-                                    },
-                                    tooltip: {
-                                        callbacks: {
-                                            label: (tooltipItem) =>
-                                                `${tooltipItem.raw}%`, 
-                                        },
-                                        backgroundColor: "#333",
-                                        borderColor: "#333",
-                                        borderWidth: 1,
-                                        titleFont: { size: 14 },
-                                    },
+                                    legend: { display: true, position: "top" },
                                 },
                                 scales: {
                                     x: {
                                         title: {
                                             display: true,
                                             text: "Subjects",
-                                            color: "#333",
-                                            font: { size: 16 },
                                         },
-                                        ticks: { color: "#333", font: { size: 12 } },
                                     },
                                     y: {
                                         title: {
                                             display: true,
                                             text: "Percentage (%)",
-                                            color: "#333",
-                                            font: { size: 16 },
                                         },
-                                        ticks: { color: "#333", font: { size: 12 } },
                                         min: 0,
                                         max: 100,
                                     },
                                 },
                             }}
+                            style={{ width: "100%", height: "100%" }}
                         />
                     </div>
                     <div className="assignments-week">

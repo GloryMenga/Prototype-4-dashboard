@@ -22,7 +22,7 @@ nav ul{
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  width: 25%;
 }
 .logo{
   display: flex;
@@ -582,18 +582,41 @@ nav ul{
 
 
 .performance-trend{
-  background-color: #dcdcdd;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  background-color: #cfcfcf;
+  padding: 10px;
   border-radius: 15px;
   width: 32%;
 }
-.percentage-subject{
-  background-color: #dcdcdd;
-  border-radius: 15px;
-  width: 66%;
+.title-performance-trend{
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px 0px;
+  flex-direction: column;
+}
+.title-performance-trend h2{
+  color: #333;
+  font-weight: 800;
+  font-size: 25px;
+}
+.percentage-subject{
+  background-color: #cfcfcf;
+  border-radius: 15px;
+  width: 66%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 28px 0px;
+}
+.percentage-subject h2{
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #333;
 }
 .percentage-subject canvas {
   background: transparent;
@@ -631,7 +654,24 @@ nav ul{
   justify-content: flex-start;
   width: 100%;
 }
+.dropdown-container h2{
+  font-weight: 800;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 30px;
 
+}
+.subject-dropdown{
+  width: 100%;
+}
+.modern-chart-dropdown{
+  height: 40px;
+  width: 60%;
+  border: none;
+  border-radius: 7px;
+  outline: none;
+  margin-top: 10px;
+}
 .modern-dropdown {
   width: 15%; 
   margin-left: 40px;
@@ -670,7 +710,7 @@ nav ul{
   background-color: white;
   height: 50vh;
   gap: 40px;
-  padding: 20px;
+  padding:  40px 20px 20px 20px;
 }
 
 .grades {

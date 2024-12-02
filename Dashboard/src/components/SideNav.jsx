@@ -63,14 +63,6 @@ function SideNav() {
                                     <p>Calendar</p>
                                 </div>
                             </Link>
-                            <Link to={"/settings"}>
-                                <div
-                                    className={`menu-icon ${isActive("/settings") ? "active" : ""}`}
-                                >
-                                    <img src={Settings} alt="Settings" />
-                                    <p>Settings</p>
-                                </div>
-                            </Link>
                         </div>
                     </div> 
                 </ul>
