@@ -1,5 +1,7 @@
 import React from "react";
 import SideNav from "../components/SideNav.jsx";
+import Dashboard from "../components/Dashboard.jsx";
+import Grading from "../components/Grading.jsx";
 
 function Home(){
 
@@ -8,7 +10,8 @@ function Home(){
             <div className="container">
                 <SideNav />
                 <div className="wrapper">
-                    home
+                    <Dashboard />
+                    <Grading />
                 </div>
             </div>
         </>

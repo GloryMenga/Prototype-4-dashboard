@@ -17,6 +17,7 @@ nav ul{
   height: 88%;
 }
 .nav-container{
+  position: fixed;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -328,7 +329,7 @@ nav ul{
   color: #000;
 }
 .fc-day-today {
-  background-color: #c2c2c2 !important; 
+  background-color: #fff37d !important; 
   color: #333;
 }
 
@@ -498,4 +499,155 @@ nav ul{
 .event-details strong {
   font-weight: bold;
   color: #000;
+}
+
+/*dashboard*/
+.dashboard{
+  height: 100vh;
+}
+.grading{
+  display: flex;
+  flex-direction: row;
+  background-color: white;
+  height: 50vh;
+  gap: 40px;
+  padding: 20px;
+}
+
+.grades {
+  flex: 1;
+}
+
+.grades h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.list-grades {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid #c5c5c5;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-height: 250px;
+  overflow-y: auto;
+}
+.grade-item{
+  background-color: #d3d3d3;
+  border-radius: 10px;
+  padding: 5px;
+}
+.list-grades p {
+  color: #333;
+  font-size: 14px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  transition: background-color 0.3s ease;
+}
+
+.list-grades p:hover {
+  background-color: #e8f0fe;
+  cursor: pointer;
+}
+
+.grades-form {
+  flex: 1;
+}
+
+.grades-form h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.input-grades {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  border: 1px solid #5e616b;
+  border-radius: 15px;
+}
+
+.input-grades input,
+.input-grades select {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  margin-left: 10px;
+  border-radius: 10px;
+  padding: 5px 10px;
+}
+
+.input-grades svg {
+  color: #696969;
+}
+
+.add-grade-button {
+  margin-top: 20px;
+  padding: 15px 30px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-grade-button:hover {
+  background-color: #1f1e1e;
+}
+
+.list-grades {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid #c5c5c5;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.list-grades p {
+  color: #333;
+  font-size: 14px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  transition: background-color 0.3s ease;
+}
+
+.list-grades p:hover {
+  background-color: #e8f0fe;
+  cursor: pointer;
+}
+
+.grade-actions button{
+  width: 25%;
+  margin-right: 20px;
+  height: 50px;
+  margin-top: 50px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-family: 'Noto Sans';
+  background-color: #70737e;
+  cursor: pointer;
+  font-weight: 800;
+  transition: 0.3s;
+}
+.grade-actions button:hover{
+  background-color: #414246;
 }

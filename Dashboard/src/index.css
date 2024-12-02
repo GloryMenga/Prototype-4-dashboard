@@ -32,3 +32,8 @@ a{
   display: flex;
   flex-direction: row;
 }
+.wrapper{
+  display: flex;
+  flex-direction: column;
+  width: 75%;
+}

@@ -2,8 +2,7 @@
 require("dotenv").config(); 
 const express = require("express");
 const cors = require("cors");
-const { MongoClient } = require("mongodb");
-const { ObjectId } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
 
@@ -16,7 +15,35 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Routes
+let isConnected = false;
+
+async function connectToMongoDB() {
+    if (!isConnected) {
+        try {
+            await client.connect();
+            console.log("Connected to MongoDB");
+            isConnected = true;
+        } catch (error) {
+            console.error("Failed to connect to MongoDB", error);
+            throw error;
+        }
+    }
+    return client.db(dbName);
+}
+
+// Middleware to ensure database connection
+const ensureDbConnection = async (req, res, next) => {
+    try {
+        await connectToMongoDB();
+        next();
+    } catch (error) {
+        res.status(500).send({ 
+            status: "Error", 
+            message: "Database connection failed", 
+            error: error.message 
+        });
+    }
+};
 
 // Register a new user
 app.post("/register", async (req, res) => {
@@ -34,8 +61,8 @@ app.post("/register", async (req, res) => {
         await client.connect();
         const db = client.db(dbName);
         const usersCollection = db.collection("Users");
+        const studentsCollection = db.collection("Students");
 
-        // Check if email is already registered
         const existingUser = await usersCollection.findOne({ email });
         if (existingUser) {
             return res.status(409).send({
@@ -44,21 +71,25 @@ app.post("/register", async (req, res) => {
             });
         }
 
-        // Hash password and store user
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = { 
             uuid: uuidv4(), 
             username, 
             email, 
             password: hashedPassword, 
-            status: "Student", // Default status
-            gender, // Include gender
+            status: "Student", 
+            gender, 
         };
-        await usersCollection.insertOne(newUser);
+        const userResult = await usersCollection.insertOne(newUser);
+
+        const newStudent = {
+            name: username
+        };
+        await studentsCollection.insertOne(newStudent);
 
         res.status(201).send({
             status: "Success",
-            message: "User registered successfully.",
+            message: "User and student registered successfully.",
             data: { 
                 uuid: newUser.uuid, 
                 username: newUser.username, 
@@ -196,7 +227,7 @@ app.put("/assignments/:id", async (req, res) => {
 
         const updatedAssignment = { name, description, deadline };
         const result = await assignmentsCollection.updateOne(
-            { _id: new ObjectId(id) }, // Convert id to ObjectId
+            { _id: new ObjectId(id) }, 
             { $set: updatedAssignment }
         );
 
@@ -235,7 +266,238 @@ app.delete("/assignments/:id", async (req, res) => {
     }
 });
 
+// Fetch Grades
+app.get("/grades", async (req, res) => {
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const gradesCollection = db.collection("Grades");
+
+        const grades = await gradesCollection.find().sort({ createdAt: -1 }).toArray();
+        res.status(200).send(grades);
+    } catch (error) {
+        res.status(500).send({ 
+            status: "Error", 
+            message: "Failed to retrieve grades", 
+            error 
+        });
+    } finally {
+        await client.close();
+    }
+});
+
+// Modify the existing add grade endpoint to remove assignment collection validation
+app.post("/grades", async (req, res) => {
+    const { assignmentName, studentName, subjectName, date, grade } = req.body;
+
+    if (!assignmentName || !studentName || !subjectName || !date || !grade) {
+        return res.status(400).send({ 
+            status: "Bad Request", 
+            message: "All fields (assignmentName, studentName, subjectName, date, grade) are required." 
+        });
+    }
+
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const gradesCollection = db.collection("Grades");
+        
+        // Validate that the student exists
+        const studentsCollection = db.collection("Students");
+        const studentExists = await studentsCollection.findOne({ name: studentName });
+        if (!studentExists) {
+            return res.status(404).send({ 
+                status: "Not Found", 
+                message: "Student not found." 
+            });
+        }
+
+        // Validate that the subject exists
+        const subjectsCollection = db.collection("Subjects");
+        const subjectExists = await subjectsCollection.findOne({ name: subjectName });
+        if (!subjectExists) {
+            return res.status(404).send({ 
+                status: "Not Found", 
+                message: "Subject not found." 
+            });
+        }
+
+        // Prepare the grade entry
+        const newGrade = { 
+            assignmentName, 
+            studentName, 
+            subjectName, 
+            date: new Date(date), 
+            grade: parseFloat(grade),
+            createdAt: new Date()
+        };
+
+        // Insert the grade
+        const result = await gradesCollection.insertOne(newGrade);
+
+        if (!result.insertedId) {
+            return res.status(500).send({ 
+                status: "Error", 
+                message: "Failed to add grade." 
+            });
+        }
+
+        res.status(201).send({ 
+            status: "Success", 
+            message: "Grade added successfully", 
+            data: newGrade 
+        });
+    } catch (error) {
+        console.error("Error while adding grade:", error);
+        res.status(500).send({ 
+            status: "Error", 
+            message: "Failed to add grade.", 
+            error: error.message 
+        });
+    } finally {
+        await client.close();
+    }
+});
+
+// Fetch Subjects for dropdown
+app.get("/subjects", ensureDbConnection, async (req, res) => {
+    try {
+        const db = client.db(dbName);
+        const subjectsCollection = db.collection("Subjects");
+
+        const subjects = await subjectsCollection.find().toArray();
+        res.status(200).send(subjects);
+    } catch (error) {
+        res.status(500).send({ 
+            status: "Error", 
+            message: "Failed to retrieve subjects", 
+            error 
+        });
+    }
+});
+
+// Fetch Students for dropdown
+app.get("/students", ensureDbConnection, async (req, res) => {
+    try {
+        const db = client.db(dbName);
+        const studentsCollection = db.collection("Students");
+
+        // Log the count of students before fetching
+        const studentCount = await studentsCollection.countDocuments();
+        const students = await studentsCollection.find().toArray();
+
+        res.status(200).send(students);
+    } catch (error) {
+        console.error("Error fetching students:", error);
+        res.status(500).send({ 
+            status: "Error", 
+            message: "Failed to retrieve students.", 
+            error: error.message 
+        });
+    }
+});
+
+process.on('SIGINT', async () => {
+    try {
+        await client.close();
+        console.log('MongoDB connection closed');
+        process.exit(0);
+    } catch (error) {
+        console.error('Error closing MongoDB connection', error);
+        process.exit(1);
+    }
+});
+
+// Update Grade
+app.put("/grades/:id", async (req, res) => {
+    const { id } = req.params;
+    const { assignmentName, studentName, subjectName, date, grade } = req.body;
+
+    if (!assignmentName || !studentName || !subjectName || !date || !grade) {
+        return res.status(400).send({ 
+            status: "Bad Request", 
+            message: "All fields (assignmentName, studentName, subjectName, date, grade) are required." 
+        });
+    }
+
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const gradesCollection = db.collection("Grades");
+
+        const updatedGrade = {
+            assignmentName,
+            studentName,
+            subjectName,
+            date: new Date(date),
+            grade: parseFloat(grade),
+        };
+
+        const result = await gradesCollection.updateOne(
+            { _id: new ObjectId(id) },
+            { $set: updatedGrade }
+        );
+
+        if (result.matchedCount === 0) {
+            return res.status(404).send({ 
+                status: "Not Found", 
+                message: "Grade not found." 
+            });
+        }
+
+        res.status(200).send({ 
+            status: "Success", 
+            message: "Grade updated successfully." 
+        });
+    } catch (error) {
+        console.error("Error updating grade:", error);
+        res.status(500).send({ 
+            status: "Error", 
+            message: "Failed to update grade.", 
+            error: error.message 
+        });
+    }
+});
+
+// Delete Grade
+app.delete("/grades/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const gradesCollection = db.collection("Grades");
+
+        const result = await gradesCollection.deleteOne({ _id: new ObjectId(id) });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).send({ 
+                status: "Not Found", 
+                message: "Grade not found." 
+            });
+        }
+
+        res.status(200).send({ 
+            status: "Success", 
+            message: "Grade deleted successfully." 
+        });
+    } catch (error) {
+        console.error("Error deleting grade:", error);
+        res.status(500).send({ 
+            status: "Error", 
+            message: "Failed to delete grade.", 
+            error: error.message 
+        });
+    }
+});
+
+
 // Start the server
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+app.listen(port, async () => {
+    try {
+        await connectToMongoDB();
+        console.log(`Server is running on http://localhost:${port}`);
+    } catch (error) {
+        console.error("Failed to start server", error);
+    }
 });
